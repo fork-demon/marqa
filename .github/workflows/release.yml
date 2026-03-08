@@ -18,7 +18,7 @@ jobs:
             os: macos-latest
             target: aarch64-apple-darwin
           - name: macOS (Intel)
-            os: macos-13
+            os: macos-15-large
             target: x86_64-apple-darwin
           - name: Windows
             os: windows-latest
@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
 

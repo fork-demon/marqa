@@ -75,14 +75,19 @@ jobs:
         with:
           path: artifacts
 
-      - name: List artifacts
-        run: find artifacts -type f | head -20
+      - name: Rename artifacts (strip version for stable download URLs)
+        run: |
+          mkdir -p release
+          for f in artifacts/**/*.dmg artifacts/**/*.exe; do
+            # Strip version pattern like _0.1.0_ → _
+            newname=$(basename "$f" | sed 's/_[0-9]*\.[0-9]*\.[0-9]*_/_/g; s/_[0-9]*\.[0-9]*\.[0-9]*-/-/g')
+            cp "$f" "release/$newname"
+          done
+          ls -la release/
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           draft: false
           generate_release_notes: true
-          files: |
-            artifacts/**/*.dmg
-            artifacts/**/*.exe
+          files: release/*

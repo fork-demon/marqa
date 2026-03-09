@@ -42,11 +42,19 @@ jobs:
           node-version: 20
           cache: npm
 
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli --version "^2" --locked
+
       - name: Install frontend dependencies
         run: npm ci
 
       - name: Build
-        run: npx tauri build --target ${{ matrix.target }}
+        run: cargo tauri build --target ${{ matrix.target }}
 
       - name: Upload macOS artifacts
         if: runner.os == 'macOS'

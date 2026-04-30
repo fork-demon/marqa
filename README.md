@@ -1,6 +1,6 @@
-<p align="center">
-  <img src="/Users/arvind/.gemini/antigravity/brain/4d468953-7ff5-471d-85a0-e48fb43dd97e/marqa_new_banner_1777564111662.png" alt="Marqa Banner" width="100%">
-</p>
+<img width="1193" height="796" alt="image" src="https://github.com/user-attachments/assets/36a19f37-3539-482c-a62b-2f1a5c685bb6" />
+<img width="1193" height="793" alt="image" src="https://github.com/user-attachments/assets/3b229a81-58ef-4a36-b6d4-ca2585755992" />
+
 
 # Marqa
 

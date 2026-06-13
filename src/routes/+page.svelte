@@ -93,6 +93,19 @@
   // Zoom state
   let zoomLevel = $state(1);
 
+  // Width mode: 'narrow' | 'wide' | 'full'
+  let widthMode = $state('narrow');
+  const WIDTH_MODES = ['narrow', 'wide', 'full'];
+  const WIDTH_META = {
+    narrow: { label: 'Narrow', px: 720, padding: 60 },
+    wide: { label: 'Wide', px: 960, padding: 80 },
+    full: { label: 'Full width', px: 0, padding: 60 },
+  };
+  function cycleWidth() {
+    const idx = WIDTH_MODES.indexOf(widthMode);
+    widthMode = WIDTH_MODES[(idx + 1) % WIDTH_MODES.length];
+  }
+
   // Presentation mode state
   let presentMode = $state(false);
 
@@ -796,6 +809,20 @@
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/></svg>
           {/if}
         </button>
+        <button class="ghost-btn width-toggle" onclick={cycleWidth} title={`Editor width: ${WIDTH_META[widthMode].label} (${WIDTH_META[widthMode].px > 0 ? WIDTH_META[widthMode].px + 'px' : '100%'})`}>
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+            {#if widthMode === 'narrow'}
+              <path d="M3.5 8l2-2M3.5 8l2 2M12.5 8l-2-2M12.5 8l-2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5.5 8h5" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
+            {:else if widthMode === 'wide'}
+              <path d="M1.5 8l2.5-2.5M1.5 8l2.5 2.5M14.5 8l-2.5-2.5M14.5 8l-2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 8h8" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
+            {:else}
+              <path d="M.5 8l2.5-3M.5 8l2.5 3M15.5 8l-2.5-3M15.5 8l-2.5 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 8h10" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
+            {/if}
+          </svg>
+        </button>
         <button class="ghost-btn" onclick={() => dark = !dark}>
           {#if dark}
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M8 2.5v1M8 12.5v1M2.5 8h1M12.5 8h1M4.2 4.2l.7.7M11.1 11.1l.7.7M4.2 11.8l.7-.7M11.1 4.9l.7-.7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
@@ -920,7 +947,7 @@
     {/if}
 
     <!-- Editor surface -->
-    <div class="editor-surface">
+    <div class="editor-surface" class:is-wide={widthMode === 'wide'} class:is-full={widthMode === 'full'}>
       {#if hasOpenTabs && showSearch}
         <div class="search-bar">
           <div class="search-row">
@@ -1632,6 +1659,16 @@
     line-height: 1.65;
     color: var(--text);
   }
+  .is-wide .rich-wrap :global(.prose-editor) {
+    max-width: 960px;
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .is-full .rich-wrap :global(.prose-editor) {
+    max-width: 100%;
+    padding-left: 60px;
+    padding-right: 60px;
+  }
 
   .rich-wrap :global(.prose-editor:focus) { outline: none; }
 
@@ -1795,6 +1832,16 @@
     font-family: var(--font-mono);
     font-size: 14px; line-height: 1.8;
     tab-size: 2;
+  }
+  .is-wide .source-wrap {
+    max-width: 980px;
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  .is-full .source-wrap {
+    max-width: 100%;
+    padding-left: 60px;
+    padding-right: 60px;
   }
   .source-wrap::placeholder { color: var(--text-muted); opacity: 0.5; }
 

@@ -90,6 +90,9 @@
   let showColorPicker = $state(false);
   let colorPickerPos = $state({ x: 0, y: 0 });
 
+  // Zoom state
+  let zoomLevel = $state(1);
+
   // Presentation mode state
   let presentMode = $state(false);
 
@@ -607,6 +610,9 @@
     if (mod && e.key === '\\') { e.preventDefault(); sidebar = !sidebar; }
     if (mod && e.key === '/') { e.preventDefault(); toggleSource(); }
     if (mod && e.key === 'd') { e.preventDefault(); showDiagram = true; }
+    if (mod && (e.key === '=' || e.key === '+')) { e.preventDefault(); zoomLevel = Math.min(2, zoomLevel + 0.1); }
+    if (mod && e.key === '-') { e.preventDefault(); zoomLevel = Math.max(0.5, zoomLevel - 0.1); }
+    if (mod && e.key === '0') { e.preventDefault(); zoomLevel = 1; }
     if (e.key === 'Escape' && presentMode) { exitPresentation(); }
   }
 
@@ -973,7 +979,7 @@
           {/if}
         </div>
       {/if}
-      <div class="rich-wrap" class:is-hidden={source || !hasOpenTabs} bind:this={editorEl}></div>
+      <div class="rich-wrap" class:is-hidden={source || !hasOpenTabs} bind:this={editorEl} style="zoom: {zoomLevel};"></div>
       <textarea
         class="source-wrap"
         class:is-hidden={!source || !hasOpenTabs}
@@ -981,6 +987,7 @@
         oninput={onSourceInput}
         placeholder="Write markdown..."
         spellcheck="false"
+        style="zoom: {zoomLevel};"
       ></textarea>
       {#if !hasOpenTabs}
         <div class="empty-state">
@@ -1012,6 +1019,7 @@
           <span class="path" title={filePath}>{filePath}</span>
         {/if}
         <span class="grow"></span>
+        <span class="zoom-level">{Math.round(zoomLevel * 100)}%</span>
         <span class="tag">{source ? 'Markdown' : 'Rich Text'}</span>
       {:else}
         <span class="grow"></span>
@@ -1806,6 +1814,16 @@
 
   .dim { opacity: 0.3; }
   .path { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .zoom-level {
+    font-size: 10px; font-weight: 600;
+    font-family: var(--font-mono);
+    padding: 1px 6px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    min-width: 32px;
+    text-align: center;
+  }
   .grow { flex: 1; }
   .tag {
     font-size: 9px; font-weight: 700;

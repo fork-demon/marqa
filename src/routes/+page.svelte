@@ -61,6 +61,11 @@
   // ── State ──
   let sidebar = $state(true);
   let sidePanel = $state('files'); // 'files' | 'agents' | null (rail only)
+  let panelWidth = $state(200);
+  let sideDrag = $state(false);
+  const SIDE_MIN = 140;
+  const SIDE_MAX = 600;
+  const RAIL_W = 42;
   let dark = $state(false);
   let filePath = $state('');
   let fileName = $state('Untitled');
@@ -639,6 +644,25 @@
     tableGridRows = 4; tableGridCols = 4;
   }
 
+  // ── Sidebar drag resize ──
+  function onSideDragStart(e) {
+    sideDrag = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  }
+
+  function onSideDragMove(e) {
+    if (!sideDrag) return;
+    const newW = Math.min(SIDE_MAX, Math.max(SIDE_MIN, e.clientX - RAIL_W));
+    panelWidth = newW;
+  }
+
+  function onSideDragEnd(e) {
+    if (!sideDrag) return;
+    sideDrag = false;
+    e.currentTarget?.releasePointerCapture(e.pointerId);
+  }
+
   function onTableCellHover(r, c) {
     tableHoverR = r; tableHoverC = c;
     // Auto-expand grid when hovering near edges (Confluence-style)
@@ -707,7 +731,7 @@
 <div class="app" class:present-hidden={presentMode}>
   <!-- ─── Sidebar ─── -->
   {#if sidebar}
-    <aside class="sidebar">
+    <aside class="sidebar" style="width: {RAIL_W + panelWidth}px">
       <!-- Icon rail -->
       <div class="side-rail">
         <!-- Workspace folder tabs -->
@@ -737,7 +761,7 @@
 
       <!-- File panel (right of rail) -->
       {#if sidePanel}
-        <div class="side-panel">
+        <div class="side-panel" style="width: {panelWidth}px">
           {#if sidePanel === 'files'}
             <div class="side-header">
               <span class="side-title">{entries.length > 0 ? (folder.split('/').pop() || 'Files') : 'Explorer'}</span>
@@ -762,6 +786,13 @@
         </div>
       {/if}
     </aside>
+    <div
+      class="side-drag"
+      class:is-active={sideDrag}
+      onpointerdown={onSideDragStart}
+      onpointermove={onSideDragMove}
+      onpointerup={onSideDragEnd}
+    ></div>
   {/if}
 
   <!-- ─── Canvas ─── -->
@@ -1131,7 +1162,6 @@
 
   /* File panel (right of rail) */
   .side-panel {
-    width: 200px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -1184,6 +1214,22 @@
     color: var(--text-muted);
     font-size: 11.5px;
     opacity: 0.5;
+  }
+
+  /* ═══ Sidebar drag handle ═══ */
+  .side-drag {
+    width: 4px;
+    cursor: col-resize;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
+    transition: background 0.15s;
+    background: transparent;
+    margin-left: -2px;
+  }
+  .side-drag:hover,
+  .side-drag.is-active {
+    background: var(--accent);
   }
 
 
